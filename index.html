@@ -45,15 +45,18 @@
     // MASUKKAN URL WEB APP GAS ANDA DI BAWAH INI
     const GAS_URL = "https://script.google.com/macros/s/AKfycbx6NxI3hgiwFg35lQ2wL7VglEdx3jMVwHhSMRbN4JJvulzTl4EvH9sF8TUU-IiV8ZaPeA/exec";
 
-// Helper untuk kirim data ke GAS (Versi Anti-Blokir)
+// Helper untuk kirim data ke GAS (Versi Form URL-Encoded Anti-Hilang)
     const sendToGAS = (action, payload) => {
-      return fetch(GAS_URL + "?action=" + action, {
-        redirect: "follow", // Wajib agar bisa melewati redirect Google
+      const formData = new URLSearchParams();
+      formData.append("action", action);
+      formData.append("data", JSON.stringify(payload));
+
+      return fetch(GAS_URL, {
         method: "POST",
+        body: formData,
         headers: {
-          "Content-Type": "text/plain;charset=utf-8", // Wajib text/plain agar tidak diblokir CORS
-        },
-        body: JSON.stringify(payload)
+          "Content-Type": "application/x-www-form-urlencoded" // Trik agar tidak diblokir browser
+        }
       })
       .then(res => res.json())
       .then(res => console.log("Respons GAS:", res))
