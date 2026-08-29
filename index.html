@@ -45,21 +45,17 @@
     // MASUKKAN URL WEB APP GAS ANDA DI BAWAH INI
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzB7g57NIvcorjSUpyxwTN_7WMwkjeahK-KSMPHpl91DRFsaV8fVG3nzJwfhVjOvKCloQ/exec";
 
-// Helper untuk kirim data ke GAS (Versi Form URL-Encoded Anti-Hilang)
+// Helper untuk kirim data ke GAS (Versi GET - Anti Gagal & Anti Blokir)
     const sendToGAS = (action, payload) => {
-      const formData = new URLSearchParams();
-      formData.append("action", action);
-      formData.append("data", JSON.stringify(payload));
+      // Data dibungkus ke dalam link URL agar tidak hilang saat diredirect Google
+      const dataString = encodeURIComponent(JSON.stringify(payload));
+      const finalUrl = GAS_URL + "?action=" + action + "&data=" + dataString;
 
-      return fetch(GAS_URL, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded" // Trik agar tidak diblokir browser
-        }
+      return fetch(finalUrl, {
+        method: "GET" // Menggunakan GET
       })
       .then(res => res.json())
-      .then(res => console.log("Respons GAS:", res))
+      .then(res => console.log("Data berhasil disimpan:", res))
       .catch(e => console.error("Error API:", e));
     };
 
