@@ -54,7 +54,7 @@
     };
 
     // ==========================================
-    // 1. ADAPTOR IKON (Disingkat untuk keterbacaan, sama persis seperti milik Anda)
+    // 1. ADAPTOR IKON
     // ==========================================
     const MIcon = ({ name, size = 24, className = '', style = {} }) => (
       <span className={`material-symbols-outlined ${className}`} style={{ fontSize: size, ...style }}>{name}</span>
@@ -94,7 +94,9 @@
     const Close = (p) => <MIcon name="close" {...p} />;
     const Sync = (p) => <MIcon name="sync" {...p} />;
 
-    // UTILITAS & FUNGSI CETAK PDF (Tetap Sama)
+    // ==========================================
+    // UTILITAS & FUNGSI CETAK PDF
+    // ==========================================
     const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
     const getLocalDateString = (isoString) => { const d = new Date(isoString); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
@@ -128,8 +130,8 @@
       const [announcement, setAnnouncement] = useState({ message: '', active: false, date: '' });
       const [notifications, setNotifications] = useState([]);
 
-      // MODIFIKASI: Menggunakan fetch API sebagai ganti google.script.run
       useEffect(() => {
+        // MENGGUNAKAN FETCH API UNTUK MENGAMBIL DATA
         fetch(GAS_URL + "?action=getInitialData")
           .then(res => res.json())
           .then(data => {
@@ -144,7 +146,6 @@
           });
       }, []);
 
-      // MODIFIKASI: Auto-sync menggunakan fetch
       useEffect(() => {
         let syncInterval;
         if (currentUser) {
@@ -190,21 +191,31 @@
     }
 
     // ==========================================
-    // LOGIN SCREEN (Tetap Sama)
+    // LOGIN SCREEN
     // ==========================================
     function LoginScreen({ onLogin, isDarkMode, toggleDarkMode }) {
       const [username, setUsername] = useState('');
       const [password, setPassword] = useState('');
       const [showPassword, setShowPassword] = useState(false);
       const [error, setError] = useState('');
+
       const handleSubmit = (e) => { e.preventDefault(); if (!onLogin(username, password)) setError('Nama pengguna atau kata sandi salah!'); };
 
       return (
         <div className={`relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-900 text-slate-800'}`}>
+          <div className="absolute top-1/4 -left-20 w-80 h-80 bg-blue-600/30 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+          <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-emerald-500/20 rounded-full blur-[110px] pointer-events-none animate-pulse delay-700"></div>
+          
           <div className={`relative w-full max-w-md rounded-3xl p-7 sm:p-8 backdrop-blur-xl border shadow-2xl ${isDarkMode ? 'bg-slate-900/80 border-slate-800/80' : 'bg-white/90 border-white/40'}`}>
+            <div className="flex justify-between items-center mb-6">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold"><Sparkles size={13} className="animate-spin" style={{ animationDuration: '4s' }} /><span>Tabungan Digital</span></div>
+              <button onClick={toggleDarkMode} className="p-2.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition active:scale-95">{isDarkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}</button>
+            </div>
             <div className="flex justify-center mb-5"><div className="relative p-1 rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-emerald-400 shadow-lg"><div className="bg-slate-900 p-4 rounded-[22px]"><Wallet size={36} className="text-emerald-400" /></div></div></div>
             <div className="text-center mb-6"><h1 className="text-xl font-bold tracking-tight">Tabungan Al-Muttaqin</h1><p className="text-xs text-slate-500 mt-1">Sistem Tabungan Rutin Hari Kamis</p></div>
+
             {error && <div className="mb-4 p-3 rounded-2xl bg-red-500/10 text-red-500 text-xs flex items-center gap-2"><ShieldAlert size={16} /><span>{error}</span></div>}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div><div className="relative"><User size={16} className="absolute left-3.5 top-3.5 text-slate-400" /><input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className={`w-full pl-10 pr-4 py-2.5 rounded-2xl text-xs font-medium border outline-none ${isDarkMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`} required /></div></div>
               <div><div className="relative"><Lock size={16} className="absolute left-3.5 top-3.5 text-slate-400" /><input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className={`w-full pl-10 pr-10 py-2.5 rounded-2xl text-xs font-medium border outline-none ${isDarkMode ? 'bg-slate-800/80 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`} required /><button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-3.5 text-slate-400">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button></div></div>
@@ -216,7 +227,7 @@
     }
 
     // ==========================================
-    // DASHBOARD ADMIN 
+    // DASHBOARD ADMIN
     // ==========================================
     function AdminDashboard({ users, setUsers, transactions, setTransactions, onLogout, isDarkMode, toggleDarkMode, currentUser, setCurrentUser, announcement, setAnnouncement, setNotifications }) {
       const [activeTab, setActiveTab] = useState('home');
@@ -257,12 +268,11 @@
       const filteredStudents = useMemo(() => students.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.nis.toLowerCase().includes(searchQuery.toLowerCase())), [students, searchQuery]);
       const allSortedStudents = [...students].sort((a, b) => b.balance - a.balance);
 
-      // MODIFIKASI: Aksi Admin
       const handleSaveAdmin = (e) => {
         e.preventDefault();
         const updated = { ...currentUser, username: adminUsername, password: adminPassword };
         setUsers(users.map(u => u.id === currentUser.id ? updated : u)); setCurrentUser(updated);
-        sendToGAS('updateUser', updated); // Mengirim via Fetch
+        sendToGAS('updateUser', updated); // MENGIRIM VIA API
         setAdminSuccess('Akun diperbarui!'); setTimeout(()=>setShowAdminAccountModal(false), 1500);
       };
 
@@ -270,7 +280,7 @@
         e.preventDefault();
         const updated = { ...users.find(u=>u.id===selectedJamaahId), username: newJamaahUser, password: newJamaahPass };
         setUsers(users.map(u => u.id === selectedJamaahId ? updated : u));
-        sendToGAS('updateUser', updated); // Mengirim via Fetch
+        sendToGAS('updateUser', updated); // MENGIRIM VIA API
         alert('Data Jamaah berhasil di-reset!'); setShowResetJamaahModal(false);
       };
 
@@ -278,7 +288,7 @@
         e.preventDefault();
         const newAnn = { message: editAnnText, active: editAnnActive, date: new Date().toISOString() };
         setAnnouncement(newAnn);
-        sendToGAS('updateAnnouncement', newAnn); // Mengirim via Fetch
+        sendToGAS('updateAnnouncement', newAnn); // MENGIRIM VIA API
         setShowAnnouncementModal(false);
       };
 
@@ -294,7 +304,7 @@
         const newStudentData = { id: `u${Date.now()}`, username: inputUsername, password: newStudent.password, role: 'student', name: inputName, balance: 0, nis: nextID };
         
         setUsers([newStudentData, ...users]);
-        sendToGAS('addStudent', newStudentData); // Mengirim via Fetch
+        sendToGAS('addStudent', newStudentData); // MENGIRIM VIA API
         setNewStudent({ name: '', username: '', password: '' });
         setShowAddStudent(false); alert(`Berhasil ditambahkan!`);
       };
@@ -305,12 +315,13 @@
         setUsers(users.map(u => u.id === studentId ? { ...u, balance: type === 'in' ? u.balance + Number(amount) : u.balance - Number(amount) } : u));
         setSelectedStudent(prev => ({ ...prev, balance: type === 'in' ? prev.balance + Number(amount) : prev.balance - Number(amount) }));
         setNotifications(prev => [...prev, { id: `notif-${Date.now()}`, studentId, type, amount: Number(amount), read: false, date: new Date().toISOString() }]);
-        sendToGAS('saveTransaction', newTrx); // Mengirim via Fetch
+        sendToGAS('saveTransaction', newTrx); // MENGIRIM VIA API
       };
 
       const exportPDF = () => {
-        // (Kode cetak PDF tetap sama)
-        const html = `<html><head><title>Laporan Tabungan</title><style>body{font-family:sans-serif;padding:20px} table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #ccc;padding:8px} th{background:#f0f8ff} .right{text-align:right} .green{color:green} .red{color:red}</style></head><body><h2 align="center">Laporan Tabungan Al-Muttaqin</h2><table><thead><tr><th>No</th><th>Tanggal</th><th>Jama'ah</th><th>Ket</th><th>Jenis</th><th class="right">Nominal</th></tr></thead><tbody>${[...filteredHistory].sort((a,b)=>new Date(a.date)-new Date(b.date)).map((t,i)=>`<tr><td>${i+1}</td><td>${new Date(t.date).toLocaleDateString()}</td><td>${students.find(s=>s.id===t.studentId)?.name||'-'}</td><td>${t.description}</td><td>${t.type==='in'?'Setoran':'Penarikan'}</td><td class="right ${t.type==='in'?'green':'red'}">${formatRupiah(t.amount)}</td></tr>`).join('')}</tbody></table></body></html>`;
+        const totalIn = filteredHistory.filter(t => t.type === 'in').reduce((acc, t) => acc + t.amount, 0);
+        const totalOut = filteredHistory.filter(t => t.type === 'out').reduce((acc, t) => acc + t.amount, 0);
+        const html = `<html><head><title>Laporan Tabungan</title><style>body{font-family:sans-serif;padding:20px} table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #ccc;padding:8px} th{background:#f0f8ff} .right{text-align:right} .green{color:green} .red{color:red}</style></head><body><h2 align="center">Laporan Tabungan Al-Muttaqin</h2><table><thead><tr><th>No</th><th>Tanggal</th><th>Jama'ah</th><th>Ket</th><th>Jenis</th><th class="right">Nominal</th></tr></thead><tbody>${[...filteredHistory].sort((a,b)=>new Date(a.date)-new Date(b.date)).map((t,i)=>`<tr><td>${i+1}</td><td>${new Date(t.date).toLocaleDateString()}</td><td>${students.find(s=>s.id===t.studentId)?.name||'-'}</td><td>${t.description}</td><td>${t.type==='in'?'Setoran':'Penarikan'}</td><td class="right ${t.type==='in'?'green':'red'}">${formatRupiah(t.amount)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="5" class="right">Total Saldo Bersih:</td><td class="right"><b>${formatRupiah(totalIn-totalOut)}</b></td></tr></tfoot></table></body></html>`;
         printHTMLContent(html);
       };
 
@@ -322,54 +333,149 @@
         <div className={`flex flex-col h-full relative pb-16 transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
           <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-5 rounded-b-3xl shadow-lg z-10 shrink-0">
             <div className="flex justify-between items-start">
-              <div><div className="flex items-center gap-1.5 mb-1"><BookOpen size={18} /><h2 className="text-base font-bold">Tabungan Yasinan</h2></div></div>
-              <button onClick={onLogout} className="p-2 hover:bg-red-500/80 rounded-xl text-red-200"><LogOut size={18}/></button>
+              <div><div className="flex items-center gap-1.5 mb-1"><BookOpen size={18} /><h2 className="text-base font-bold">Tabungan Yasinan</h2></div><div className="flex items-center gap-1.5 text-xs text-blue-100 font-medium my-1 bg-black/15 px-2.5 py-1 rounded-lg w-fit"><Clock size={13} /><span className="font-mono text-[11px]">{formattedDateTime}</span></div></div>
+              <div className="flex gap-1 bg-white/10 p-1 rounded-2xl">
+                <div title="Auto-Sync Aktif" className="p-2 text-blue-200 opacity-60"><Sync size={16} className="animate-spin" style={{animationDuration:'3s'}}/></div>
+                <button onClick={toggleDarkMode} className="p-2 hover:bg-white/20 rounded-xl transition">{isDarkMode ? <Sun size={18}/> : <Moon size={18}/>}</button>
+                <button onClick={() => setActiveTab('settings')} className="p-2 hover:bg-white/20 rounded-xl transition"><Settings size={18}/></button>
+                <button onClick={onLogout} className="p-2 hover:bg-red-500/80 rounded-xl text-red-200"><LogOut size={18}/></button>
+              </div>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-             {/* KODE TAMPILAN ADMIN TETAP SAMA */}
-             <div className="space-y-4">
-              <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 p-5 rounded-3xl text-white shadow-xl relative overflow-hidden">
-                <p className="text-xs text-blue-100 mb-1">Total Tabungan Jama'ah</p>
-                <h1 className="text-3xl font-extrabold tracking-tight mb-2">{formatRupiah(totalJamaahBalance)}</h1>
-              </div>
+             {activeTab === 'home' && (
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 p-5 rounded-3xl text-white shadow-xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-36 h-36 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                    <p className="text-xs text-blue-100 mb-1">Total Tabungan Jama'ah</p>
+                    <h1 className="text-3xl font-extrabold tracking-tight mb-2">{formatRupiah(totalJamaahBalance)}</h1>
+                  </div>
 
-              <div>
-                <div className="flex justify-between items-center mb-3"><h3 className="font-bold text-base">Daftar Jama'ah</h3><button onClick={() => setShowAddStudent(true)} className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md active:scale-95"><Plus size={16}/> Jama'ah</button></div>
-                <div className="space-y-2.5">
-                  {filteredStudents.map(student => (
-                    <div key={student.id} onClick={() => setSelectedStudent(student)} className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer active:scale-[0.98] ${isDarkMode ? 'bg-slate-800/90 border-slate-700/80 hover:bg-slate-800' : 'bg-white border-gray-200 hover:shadow-md'}`}>
-                      <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex justify-center items-center font-bold text-sm">{student.name.charAt(0)}</div><div><p className="font-bold text-xs">{student.name}</p><p className="text-[11px] text-gray-400">ID: {student.nis}</p></div></div>
-                      <div className="text-right"><p className="text-[10px] text-gray-400">Saldo</p><p className="font-extrabold text-blue-600 text-xs">{formatRupiah(student.balance)}</p></div>
+                  <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-emerald-50/80 border-emerald-200'}`}>
+                    <div className="flex items-center gap-1.5 mb-1"><ArrowUpCircle size={15} className="text-emerald-500"/><span className="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Setoran (Hari Ini)</span></div>
+                    <p className="text-lg font-extrabold text-emerald-700 dark:text-emerald-400 mt-1">{formatRupiah(setoranHariIni)}</p>
+                  </div>
+
+                  <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-indigo-50/80 border-indigo-200'}`}>
+                    <div className="flex justify-between items-center mb-2.5">
+                      <div className={`flex items-center gap-1.5 ${isDarkMode?'text-indigo-400':'text-indigo-600'}`}><Megaphone size={16}/><span className="text-[11px] font-bold uppercase">Papan Pengumuman</span></div>
+                      <button onClick={() => {setEditAnnText(announcement.message); setEditAnnActive(announcement.active); setShowAnnouncementModal(true);}} className={`text-[10px] px-2.5 py-1.5 rounded-lg font-bold ${isDarkMode?'bg-indigo-500/20 text-indigo-300':'bg-indigo-100 text-indigo-700'}`}>Edit</button>
                     </div>
-                  ))}
+                    <div className={`p-3.5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-indigo-100 shadow-sm'}`}>
+                      {announcement.active 
+                        ? <p className={`text-xs font-semibold leading-relaxed ${isDarkMode?'text-slate-100':'text-slate-800'}`}>{announcement.message}</p> 
+                        : <p className="text-xs text-gray-400 italic">Pengumuman dimatikan.</p>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-3"><h3 className="font-bold text-base">Daftar Jama'ah</h3><button onClick={() => setShowAddStudent(true)} className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md active:scale-95"><Plus size={16}/> Jama'ah</button></div>
+                    <div className="relative mb-3"><Search className="absolute left-3 top-3 text-gray-400" size={18}/><input type="text" placeholder="Cari jama'ah..." value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} className={`w-full border rounded-xl py-2.5 pl-10 pr-4 text-xs outline-none ${isDarkMode?'bg-slate-800 border-slate-700 text-white':'bg-white border-slate-300 text-slate-800'}`} /></div>
+                    <div className="space-y-2.5">
+                      {filteredStudents.map(student => (
+                        <div key={student.id} onClick={() => setSelectedStudent(student)} className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer active:scale-[0.98] ${isDarkMode ? 'bg-slate-800/90 border-slate-700/80 hover:bg-slate-800' : 'bg-white border-gray-200 hover:shadow-md'}`}>
+                          <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex justify-center items-center font-bold text-sm">{student.name.charAt(0)}</div><div><p className="font-bold text-xs">{student.name}</p><p className="text-[11px] text-gray-400">ID: {student.nis}</p></div></div>
+                          <div className="text-right"><p className="text-[10px] text-gray-400">Saldo</p><p className="font-extrabold text-blue-600 text-xs">{formatRupiah(student.balance)}</p></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+             )}
+
+             {activeTab === 'history' && (
+                <div className="space-y-4">
+                  <div className={`p-4 rounded-2xl border space-y-3 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'}`}>
+                    <div className="flex justify-between"><span className="text-[11px] font-bold text-gray-400 uppercase">Filter Data</span><button onClick={()=>setFilterDate('')} className="text-xs text-blue-600 font-bold">Semua</button></div>
+                    <div className="flex gap-2"><input type="date" value={filterDate} onChange={(e)=>setFilterDate(e.target.value)} className={`flex-1 border rounded-xl px-3 py-2 text-xs ${isDarkMode?'bg-slate-900 border-slate-700':'bg-slate-50 border-slate-300 text-slate-800'}`} /><select value={filterType} onChange={(e)=>setFilterType(e.target.value)} className={`w-1/3 border rounded-xl px-2 py-2 text-xs ${isDarkMode?'bg-slate-900 border-slate-700':'bg-slate-50 border-slate-300 text-slate-800'}`}><option value="all">Semua</option><option value="in">Setor</option><option value="out">Tarik</option></select></div>
+                  </div>
+                  <div className="space-y-2.5">
+                    <div className="flex justify-between items-center px-1"><span className="text-[11px] font-bold text-gray-400 uppercase">Transaksi ({filteredHistory.length})</span><button onClick={exportPDF} className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm"><Printer size={14}/> Cetak PDF</button></div>
+                    {filteredHistory.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(trx => {
+                      const std = students.find(s=>s.id === trx.studentId);
+                      return (
+                        <div key={trx.id} className={`p-3.5 rounded-2xl border flex items-center justify-between ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'}`}>
+                          <div className="flex items-center gap-3"><div className={`p-2 rounded-xl ${trx.type==='in'?'bg-emerald-50 text-emerald-600':'bg-red-50 text-red-600'}`}>{trx.type==='in'?<ArrowUpCircle size={22}/>:<ArrowDownCircle size={22}/>}</div><div><p className="font-bold text-xs">{std?.name}</p><p className="text-[10px] text-gray-400">{new Date(trx.date).toLocaleDateString('id-ID')}</p></div></div>
+                          <div className={`font-extrabold text-xs ${trx.type==='in'?'text-emerald-600':'text-red-600'}`}>{trx.type==='in'?'+':'-'}{formatRupiah(trx.amount)}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+             )}
+
+             {activeTab === 'insight' && (
+                <div className={`p-5 rounded-2xl border shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-200'}`}>
+                   <div className="flex items-center gap-3 mb-5 border-b border-gray-200 dark:border-slate-700 pb-3"><div className="bg-amber-100 p-2 rounded-xl"><Trophy className="text-amber-600" size={22}/></div><div><h3 className="font-bold text-sm">Top Tabungan Jama'ah Teraktif</h3></div></div>
+                   <div className="space-y-4">
+                      {allSortedStudents.map((s, idx) => (
+                         <div key={s.id} className="relative">
+                           <div className="flex justify-between items-end text-xs mb-1">
+                             <div className="flex items-center gap-2">
+                               <span className={`font-bold w-5 h-5 flex justify-center items-center rounded-full text-[10px] ${idx===0?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-400'}`}>{idx+1}</span>
+                               <span className="font-bold">{s.name}</span>
+                             </div>
+                             <span className="font-extrabold text-blue-600">{formatRupiah(s.balance)}</span>
+                           </div>
+                           <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                             <div className={`h-full rounded-full ${idx===0?'bg-gradient-to-r from-amber-400 to-amber-500':'bg-blue-600'}`} style={{width: `${(s.balance/(allSortedStudents[0]?.balance||1))*100}%`}}></div>
+                           </div>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+             )}
+
+             {activeTab === 'settings' && (
+                <div className={`rounded-2xl border overflow-hidden shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-200'}`}>
+                   <div className="p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center"><div className="flex items-center gap-3"><div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex justify-center items-center font-bold text-xl">{currentUser.name.charAt(0)}</div><div><p className="font-bold text-sm">{currentUser.name}</p><p className="text-xs text-blue-600 font-mono">{currentUser.username}</p></div></div><button onClick={()=>setShowAdminAccountModal(true)} className="p-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-semibold flex gap-1.5"><Key size={15}/> Edit Akun</button></div>
+                   <div className="p-2 space-y-1">
+                      <button onClick={()=>setShowResetJamaahModal(true)} className="w-full flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded-xl text-left"><div className="flex items-center gap-3"><div className="bg-indigo-50 p-2 rounded-lg text-indigo-600"><UserCheck size={18}/></div><div><p className="text-xs font-bold">Atur Ulang Akses Jama'ah</p></div></div><ChevronRight size={16} className="text-gray-400"/></button>
+                      <button onClick={toggleDarkMode} className="w-full flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded-xl"><div className="flex gap-3"><div className="bg-amber-50 p-2 rounded-lg text-amber-600">{isDarkMode?<Sun size={18}/>:<Moon size={18}/>}</div><span className="text-xs font-semibold pt-1">Tampilan {isDarkMode?'Gelap':'Terang'}</span></div><ChevronRight size={16} className="text-gray-400"/></button>
+                      <button onClick={onLogout} className="w-full flex justify-between items-center p-3 hover:bg-red-50 rounded-xl"><div className="flex gap-3"><div className="bg-red-50 p-2 rounded-lg text-red-600"><LogOut size={18}/></div><span className="text-xs font-semibold text-red-600 pt-1">Keluar</span></div></button>
+                   </div>
+                </div>
+             )}
           </div>
 
           <div className="absolute bottom-0 w-full flex justify-around px-2 py-2 z-20 pb-safe rounded-t-3xl shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.3)] bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white">
             <BottomNavItem icon={<Home size={20}/>} label="Beranda" isActive={activeTab==='home'} onClick={()=>setActiveTab('home')} />
+            <BottomNavItem icon={<History size={20}/>} label="Riwayat" isActive={activeTab==='history'} onClick={()=>setActiveTab('history')} />
+            <BottomNavItem icon={<BarChart3 size={20}/>} label="Peringkat" isActive={activeTab==='insight'} onClick={()=>setActiveTab('insight')} />
             <BottomNavItem icon={<Settings size={20}/>} label="Setting" isActive={activeTab==='settings'} onClick={()=>setActiveTab('settings')} />
           </div>
 
-          {/* MODALS */}
+          {/* ALL ADMIN MODALS */}
+          {showAdminAccountModal && (
+            <div className="absolute inset-0 z-50 bg-black/60 flex flex-col justify-end"><div className={`rounded-t-3xl p-6 h-[75%] ${isDarkMode?'bg-slate-900 text-white':'bg-white'}`}><div className="flex justify-between items-center mb-5"><h3 className="font-bold">Edit Akun Admin</h3><button onClick={()=>setShowAdminAccountModal(false)} className="text-xs">Tutup</button></div>{adminSuccess&&<p className="text-emerald-500 text-xs mb-3 font-bold">{adminSuccess}</p>}<form onSubmit={handleSaveAdmin} className="space-y-4"><div><label className="text-xs font-bold">Username</label><input type="text" className={inputClass} value={adminUsername} onChange={e=>setAdminUsername(e.target.value)} required /></div><div><label className="text-xs font-bold">Password</label><input type="text" className={inputClass} value={adminPassword} onChange={e=>setAdminPassword(e.target.value)} required /></div><button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold">Simpan</button></form></div></div>
+          )}
+          {showAnnouncementModal && (
+            <div className="absolute inset-0 z-50 bg-black/60 flex flex-col justify-end"><div className={`rounded-t-3xl p-6 h-[70%] ${isDarkMode?'bg-slate-900 text-white':'bg-white'}`}><div className="flex justify-between items-center mb-5"><h3 className="font-bold">Edit Pengumuman</h3><button onClick={()=>setShowAnnouncementModal(false)} className="text-xs">Tutup</button></div><form onSubmit={handleSaveAnnouncement} className="space-y-4"><textarea rows="5" className={inputClass} value={editAnnText} onChange={e=>setEditAnnText(e.target.value)} required/><label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={editAnnActive} onChange={e=>setEditAnnActive(e.target.checked)}/> Tampilkan Pengumuman</label><button type="submit" className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold mt-4">Simpan & Siarkan</button></form></div></div>
+          )}
           {showAddStudent && (
             <div className="absolute inset-0 z-50 bg-black/60 flex flex-col justify-end"><div className={`rounded-t-3xl p-6 h-[85%] ${isDarkMode?'bg-slate-900 text-white':'bg-white'}`}><div className="flex justify-between items-center mb-5"><h3 className="font-bold">Tambah Jama'ah Baru</h3><button onClick={()=>setShowAddStudent(false)} className="text-xs">Batal</button></div><form onSubmit={handleAddStudentSubmit} className="space-y-4"><div><label className="text-xs font-bold">Nama Lengkap</label><input type="text" className={inputClass} value={newStudent.name} onChange={e=>setNewStudent({...newStudent, name:e.target.value})} required/></div><div><label className="text-xs font-bold">Username Login</label><input type="text" className={inputClass} value={newStudent.username} onChange={e=>setNewStudent({...newStudent, username:e.target.value})} required/></div><div><label className="text-xs font-bold">Password Login</label><input type="text" className={inputClass} value={newStudent.password} onChange={e=>setNewStudent({...newStudent, password:e.target.value})} required/></div><button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-bold mt-4">Simpan Data Jama'ah</button></form></div></div>
+          )}
+          {showResetJamaahModal && (
+            <div className="absolute inset-0 z-50 bg-black/60 flex flex-col justify-end"><div className={`rounded-t-3xl p-6 h-[90%] ${isDarkMode?'bg-slate-900 text-white':'bg-white'}`}><div className="flex justify-between items-center mb-5"><h3 className="font-bold">Atur Ulang Akses Jama'ah</h3><button onClick={()=>setShowResetJamaahModal(false)} className="text-xs">Tutup</button></div><div className="flex-1 overflow-auto space-y-4"><select className={inputClass} value={selectedJamaahId} onChange={e=>{setSelectedJamaahId(e.target.value); const s=users.find(u=>u.id===e.target.value); if(s){setNewJamaahUser(s.username);setNewJamaahPass(s.password);} }}><option value="">-- Pilih Jama'ah --</option>{students.map(s=><option key={s.id} value={s.id}>{s.name} ({s.nis})</option>)}</select>{selectedJamaahId && (<form onSubmit={handleSaveJamaah} className="space-y-4 pt-4 border-t dark:border-slate-700"><div><label className="text-xs font-bold">Username Baru</label><input type="text" className={inputClass} value={newJamaahUser} onChange={e=>setNewJamaahUser(e.target.value)} required/></div><div><label className="text-xs font-bold">Password Baru</label><input type="text" className={inputClass} value={newJamaahPass} onChange={e=>setNewJamaahPass(e.target.value)} required/></div><button type="submit" className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-bold">Simpan Akses</button></form>)}</div></div></div>
           )}
         </div>
       );
     }
 
     // ==========================================
-    // DETAIL TABUNGAN JAMAAH 
+    // DETAIL TABUNGAN JAMAAH (ADMIN VIEW)
     // ==========================================
     function AdminStudentDetail({ student, transactions, onBack, onAddTransaction, isDarkMode, inputClass }) {
       const [showForm, setShowForm] = useState(false);
       const [trxType, setTrxType] = useState('in'); 
       const [amount, setAmount] = useState('');
       const [description, setDescription] = useState('');
+
+      const exportPDF = () => {
+        const html = `<html><head><title>Laporan - ${student.name}</title><style>body{font-family:sans-serif;padding:20px} table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #ccc;padding:8px} th{background:#1d4ed8;color:white} .right{text-align:right}</style></head><body><h2 align="center">Riwayat Tabungan Jama'ah</h2><p>Nama: <b>${student.name}</b><br/>ID: ${student.nis}</p><h3 align="right">Saldo Akhir: ${formatRupiah(student.balance)}</h3><table><thead><tr><th>Tanggal</th><th>Ket</th><th>Jenis</th><th class="right">Nominal</th></tr></thead><tbody>${[...transactions].sort((a,b)=>new Date(a.date)-new Date(b.date)).map(t=>`<tr><td>${new Date(t.date).toLocaleDateString()}</td><td>${t.description}</td><td>${t.type==='in'?'Setor':'Tarik'}</td><td class="right">${t.type==='in'?'+':'-'}${formatRupiah(t.amount)}</td></tr>`).join('')}</tbody></table></body></html>`;
+        printHTMLContent(html);
+      };
 
       const handleSubmit = (e) => {
         e.preventDefault();
@@ -382,6 +488,7 @@
         <div className={`flex flex-col h-full relative z-10 ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50'}`}>
           <div className={`p-4 flex justify-between items-center border-b ${isDarkMode?'border-slate-800':'bg-white border-gray-200'}`}>
             <div className="flex items-center gap-2"><button onClick={onBack} className="p-2 hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full"><ChevronLeft size={22}/></button><h2 className="font-bold text-sm">Detail Tabungan</h2></div>
+            <button onClick={exportPDF} className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold flex gap-1.5"><Printer size={15}/> Cetak</button>
           </div>
           <div className="flex-1 overflow-auto">
             <div className="p-6 bg-gradient-to-br from-blue-700 to-indigo-800 text-white rounded-b-3xl shadow-lg">
@@ -391,6 +498,17 @@
             <div className="p-4 flex gap-3 -mt-6 relative">
               <button onClick={()=>{setTrxType('in');setShowForm(true)}} className={`flex-1 p-3.5 rounded-2xl shadow-md flex flex-col items-center gap-1.5 ${isDarkMode?'bg-slate-800':'bg-white'}`}><div className="bg-blue-100 dark:bg-blue-900/50 p-2.5 rounded-full"><ArrowUpCircle size={24} className="text-blue-600"/></div><span className="font-bold text-xs">Setor</span></button>
               <button onClick={()=>{setTrxType('out');setShowForm(true)}} className={`flex-1 p-3.5 rounded-2xl shadow-md flex flex-col items-center gap-1.5 ${isDarkMode?'bg-slate-800':'bg-white'}`}><div className="bg-red-100 dark:bg-red-900/50 p-2.5 rounded-full"><ArrowDownCircle size={24} className="text-red-600"/></div><span className="font-bold text-xs">Tarik</span></button>
+            </div>
+            <div className="p-4 pt-0">
+              <h3 className="font-bold text-xs uppercase text-gray-400 mb-3">Riwayat Transaksi</h3>
+              <div className="space-y-2.5">
+                {transactions.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(trx => (
+                  <div key={trx.id} className={`p-3.5 rounded-2xl border flex justify-between items-center shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-200'}`}>
+                    <div className="flex gap-3"><div className={`p-2 rounded-xl ${trx.type==='in'?'bg-emerald-50 text-emerald-600':'bg-red-50 text-red-600'}`}>{trx.type==='in'?<ArrowUpCircle size={22}/>:<ArrowDownCircle size={22}/>}</div><div><p className="font-bold text-xs">{trx.description}</p><p className="text-[10px] text-gray-400">{new Date(trx.date).toLocaleDateString()}</p></div></div>
+                    <div className={`font-extrabold text-xs ${trx.type==='in'?'text-emerald-600':'text-red-600'}`}>{trx.type==='in'?'+':'-'}{formatRupiah(trx.amount)}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           {showForm && (
@@ -403,40 +521,183 @@
     // ==========================================
     // STUDENT DASHBOARD 
     // ==========================================
-    function StudentDashboard({ user, users, setUsers, setCurrentUser, transactions, onLogout, isDarkMode, toggleDarkMode }) {
+    function StudentDashboard({ user, users, setUsers, setCurrentUser, transactions, onLogout, isDarkMode, toggleDarkMode, announcement, notifications, setNotifications }) {
+      const [activeTab, setActiveTab] = useState('home');
+      const [toasts, setToasts] = useState([]);
+      const [showEditAcc, setShowEditAcc] = useState(false);
+      const [edUser, setEdUser] = useState(user.username);
+      const [edPass, setEdPass] = useState(user.password);
+      
       const myTransactions = transactions.filter(t => String(t.studentId) === String(user.id)).sort((a,b)=> new Date(b.date) - new Date(a.date));
+      const students = users.filter(u => u.role === 'student');
+      const allSortedStudents = [...students].sort((a, b) => b.balance - a.balance);
+
+      const inputClass = `w-full p-3 border rounded-xl text-xs focus:ring-2 outline-none mt-1 transition ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-800'}`;
+
+      useEffect(() => {
+        if (myTransactions.length > 0) {
+          const latestTrx = myTransactions[0];
+          const storageKey = `last_seen_trx_${user.id}`;
+          const lastSeenId = localStorage.getItem(storageKey);
+          
+          const isToday = getLocalDateString(latestTrx.date) === getLocalDateString(new Date().toISOString());
+
+          if (!lastSeenId && isToday) {
+            const msg = latestTrx.type === 'in' ? `Hore! Setoran Rp ${formatRupiah(latestTrx.amount)} berhasil ditambahkan!` : `Penarikan Rp ${formatRupiah(latestTrx.amount)} berhasil.`;
+            setToasts(prev => [...prev, { id: latestTrx.id, type: latestTrx.type, msg: msg }]);
+            localStorage.setItem(storageKey, latestTrx.id);
+            playNotifSound();
+            setTimeout(() => { setToasts(c => c.filter(x => x.id !== latestTrx.id)); }, 6000);
+          } 
+          else if (lastSeenId && latestTrx.id !== lastSeenId) {
+            const msg = latestTrx.type === 'in' ? `Hore! Setoran Rp ${formatRupiah(latestTrx.amount)} berhasil ditambahkan!` : `Penarikan Rp ${formatRupiah(latestTrx.amount)} berhasil.`;
+            setToasts(prev => [...prev, { id: latestTrx.id, type: latestTrx.type, msg: msg }]);
+            localStorage.setItem(storageKey, latestTrx.id);
+            playNotifSound();
+            setTimeout(() => { setToasts(c => c.filter(x => x.id !== latestTrx.id)); }, 6000);
+          }
+          else if (!lastSeenId) {
+            localStorage.setItem(storageKey, latestTrx.id);
+          }
+        }
+      }, [transactions, user.id]);
+
+      const handleSaveAcc = (e) => {
+        e.preventDefault();
+        const isUserExist = users.some(u => u.id !== user.id && u.username.toLowerCase() === edUser.trim().toLowerCase());
+        if (isUserExist) return alert(`Gagal: Username "${edUser}" sudah dipakai oleh akun lain!`);
+
+        const updated = {...user, username:edUser.trim(), password:edPass};
+        setUsers(users.map(u => u.id === user.id ? updated : u)); setCurrentUser(updated);
+        sendToGAS('updateUser', updated); // MENGIRIM VIA API
+        alert('Akun diperbarui!'); setShowEditAcc(false);
+      };
+
+      const exportPDF = () => {
+        const html = `<html><head><title>Laporan Tabungan</title><style>body{font-family:sans-serif;padding:20px} table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #ccc;padding:8px} th{background:#f0f8ff} .right{text-align:right} .green{color:green} .red{color:red}</style></head><body><h2 align="center">Laporan Tabungan Jama'ah</h2><p>Nama: <b>${user.name}</b><br/>ID: ${user.nis}</p><table><thead><tr><th>No</th><th>Tanggal</th><th>Ket</th><th>Jenis</th><th class="right">Nominal</th></tr></thead><tbody>${[...myTransactions].sort((a,b)=>new Date(a.date)-new Date(b.date)).map((t,i)=>`<tr><td>${i+1}</td><td>${new Date(t.date).toLocaleDateString()}</td><td>${t.description}</td><td>${t.type==='in'?'Setoran':'Penarikan'}</td><td class="right ${t.type==='in'?'green':'red'}">${formatRupiah(t.amount)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4" class="right">Total Saldo:</td><td class="right"><b>${formatRupiah(user.balance)}</b></td></tr></tfoot></table></body></html>`;
+        printHTMLContent(html);
+      };
 
       return (
         <div className="flex flex-col h-full relative pb-16">
+          <div className="absolute top-4 left-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+            {toasts.map(t => (
+              <div key={t.id} className={`p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-down border pointer-events-auto ${isDarkMode?'bg-slate-800 border-slate-700 text-white':'bg-white border-emerald-100 text-emerald-800'}`}>
+                <CheckCircle2 size={24} className="text-emerald-500 shrink-0"/>
+                <p className="text-xs font-bold leading-relaxed">{t.msg}</p>
+                <button onClick={()=>setToasts(c=>c.filter(x=>x.id!==t.id))} className="ml-auto p-1 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600"><Close size={16}/></button>
+              </div>
+            ))}
+          </div>
+
           <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-5 rounded-b-3xl shadow-lg z-10 shrink-0">
             <div className="flex justify-between items-center">
               <div><div className="flex items-center gap-1.5 mb-1"><BookOpen size={18}/><h2 className="text-base font-bold">Tabungan Yasinan</h2></div><p className="text-xs text-blue-100 font-medium">Hai, {user.name}</p></div>
-              <button onClick={onLogout} className="p-2 hover:bg-red-500/80 rounded-xl transition text-red-200"><LogOut size={18}/></button>
+              <div className="flex gap-1 bg-white/10 p-1 rounded-2xl">
+                <div title="Auto-Sync Aktif" className="p-2 text-blue-200 opacity-60"><Sync size={16} className="animate-spin" style={{animationDuration:'3s'}}/></div>
+                <button onClick={toggleDarkMode} className="p-2 hover:bg-white/20 rounded-xl transition text-blue-100">{isDarkMode?<Sun size={18}/>:<Moon size={18}/>}</button>
+                <button onClick={onLogout} className="p-2 hover:bg-red-500/80 rounded-xl transition text-red-200"><LogOut size={18}/></button>
+              </div>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-3xl text-white shadow-xl relative overflow-hidden">
-              <p className="text-xs opacity-80 mb-1">Total Saldo Tabungan</p>
-              <h1 className="text-3xl font-extrabold tracking-tight mb-2">{formatRupiah(user.balance)}</h1>
-              <p className="text-[11px] font-mono mt-1 opacity-70">ID: {user.nis}</p>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-sm mb-3">Transaksi Terakhir</h3>
-              <div className="space-y-2.5">
-                {myTransactions.map(trx => (
-                  <div key={trx.id} className={`p-3.5 border rounded-xl flex justify-between items-center shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-100'}`}>
-                    <div className="flex items-center gap-3">
-                      <div className={trx.type==='in'?'text-emerald-500':'text-red-500'}>{trx.type==='in'?<ArrowUpCircle size={22}/>:<ArrowDownCircle size={22}/>}</div>
-                      <div><p className="font-bold text-xs">{trx.description}</p><p className="text-[10px] text-gray-400">{new Date(trx.date).toLocaleDateString()}</p></div>
-                    </div>
-                    <div className={`font-bold text-xs ${trx.type==='in'?'text-emerald-600':'text-red-600'}`}>{trx.type==='in'?'+':'-'}{formatRupiah(trx.amount)}</div>
+             {activeTab === 'home' && (
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-3xl text-white shadow-xl relative overflow-hidden">
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                    <p className="text-xs opacity-80 mb-1">Total Saldo Tabungan</p>
+                    <h1 className="text-3xl font-extrabold tracking-tight mb-2">{formatRupiah(user.balance)}</h1>
+                    <p className="text-[11px] font-mono mt-1 opacity-70">ID: {user.nis}</p>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {announcement && announcement.active && (
+                    <div className={`p-4 rounded-2xl border flex gap-3 items-start ${isDarkMode?'bg-slate-800 border-indigo-500/30':'bg-indigo-50 border-indigo-200'}`}>
+                      <div className={`p-2 rounded-full shrink-0 ${isDarkMode?'bg-indigo-500/20 text-indigo-400':'bg-indigo-500 text-white'}`}><Megaphone size={18} className="animate-pulse"/></div>
+                      <div>
+                        <h4 className={`text-xs font-bold ${isDarkMode?'text-indigo-400':'text-indigo-700'}`}>Pengumuman Majlis</h4>
+                        <p className={`text-xs mt-1.5 font-semibold leading-relaxed ${isDarkMode?'text-slate-100':'text-slate-800'}`}>{announcement.message}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="flex justify-between items-center mb-3"><h3 className="font-bold text-sm">Transaksi Terakhir</h3><button onClick={()=>setActiveTab('history')} className="text-xs text-blue-600 font-bold hover:underline">Lihat Semua</button></div>
+                    <div className="space-y-2.5">
+                      {myTransactions.slice(0,3).map(trx => (
+                        <div key={trx.id} className={`p-3.5 border rounded-xl flex justify-between items-center shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-100'}`}>
+                          <div className="flex items-center gap-3">
+                            <div className={trx.type==='in'?'text-emerald-500':'text-red-500'}>{trx.type==='in'?<ArrowUpCircle size={22}/>:<ArrowDownCircle size={22}/>}</div>
+                            <div><p className="font-bold text-xs">{trx.description}</p><p className="text-[10px] text-gray-400">{new Date(trx.date).toLocaleDateString()}</p></div>
+                          </div>
+                          <div className={`font-bold text-xs ${trx.type==='in'?'text-emerald-600':'text-red-600'}`}>{trx.type==='in'?'+':'-'}{formatRupiah(trx.amount)}</div>
+                        </div>
+                      ))}
+                      {myTransactions.length === 0 && <p className="text-center text-gray-400 text-xs py-6 border border-dashed rounded-2xl dark:border-slate-700">Belum ada riwayat transaksi.</p>}
+                    </div>
+                  </div>
+                </div>
+             )}
+             
+             {activeTab === 'history' && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center px-1"><span className="text-[11px] font-bold text-gray-400 uppercase">Semua Riwayat ({myTransactions.length})</span><button onClick={exportPDF} className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm"><Printer size={14}/> Cetak PDF</button></div>
+                  <div className="space-y-2.5">
+                    {myTransactions.map(trx => (
+                      <div key={trx.id} className={`p-3.5 rounded-2xl border flex justify-between items-center shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-200'}`}>
+                        <div className="flex items-center gap-3"><div className={`p-2 rounded-xl ${trx.type==='in'?'bg-emerald-50 text-emerald-600':'bg-red-50 text-red-600'}`}>{trx.type==='in'?<ArrowUpCircle size={22}/>:<ArrowDownCircle size={22}/>}</div><div><p className="font-bold text-xs">{trx.description}</p><p className="text-[10px] text-gray-400">{new Date(trx.date).toLocaleDateString()}</p></div></div>
+                        <div className={`font-extrabold text-xs ${trx.type==='in'?'text-emerald-600':'text-red-600'}`}>{trx.type==='in'?'+':'-'}{formatRupiah(trx.amount)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+             )}
+
+             {activeTab === 'insight' && (
+                <div className={`p-5 rounded-2xl border shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-200'}`}>
+                   <div className="flex items-center gap-3 mb-5 border-b border-gray-200 dark:border-slate-700 pb-3"><div className="bg-amber-100 p-2 rounded-xl"><Trophy className="text-amber-600" size={22}/></div><div><h3 className="font-bold text-sm">Top Tabungan Jama'ah Teraktif</h3></div></div>
+                   <div className="space-y-4">
+                      {allSortedStudents.map((s, idx) => (
+                         <div key={s.id} className="relative">
+                           <div className="flex justify-between items-end text-xs mb-1">
+                             <div className="flex items-center gap-2">
+                               <span className={`font-bold w-5 h-5 flex justify-center items-center rounded-full text-[10px] ${idx===0?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-400'}`}>{idx+1}</span>
+                               <span className={`font-bold ${s.id===user.id?'text-blue-600':''}`}>{s.name} {s.id===user.id&&'(Anda)'}</span>
+                             </div>
+                             <span className="font-extrabold text-blue-600">{formatRupiah(s.balance)}</span>
+                           </div>
+                           <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                             <div className={`h-full rounded-full ${idx===0?'bg-gradient-to-r from-amber-400 to-amber-500':'bg-blue-600'}`} style={{width: `${(s.balance/(allSortedStudents[0]?.balance||1))*100}%`}}></div>
+                           </div>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+             )}
+
+             {activeTab === 'settings' && (
+                <div className={`rounded-2xl border overflow-hidden shadow-sm ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-gray-200'}`}>
+                   <div className="p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center"><div className="flex items-center gap-3"><div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex justify-center items-center font-bold text-xl">{user.name.charAt(0)}</div><div><p className="font-bold text-sm">{user.name}</p><p className="text-xs text-blue-600 font-mono">{user.username}</p></div></div><button onClick={()=>setShowEditAcc(true)} className="p-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-semibold flex items-center gap-1"><Edit3 size={15}/> Edit Akun</button></div>
+                   <div className="p-2 space-y-1">
+                      <button onClick={toggleDarkMode} className="w-full flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded-xl"><div className="flex gap-3"><div className="bg-amber-50 p-2 rounded-lg text-amber-600">{isDarkMode?<Sun size={18}/>:<Moon size={18}/>}</div><span className="text-xs font-semibold pt-1">Tampilan {isDarkMode?'Gelap':'Terang'}</span></div><ChevronRight size={16} className="text-gray-400"/></button>
+                      <div className="h-px bg-gray-100 dark:bg-slate-700 my-1 mx-2"></div>
+                      <button onClick={onLogout} className="w-full flex justify-between items-center p-3 hover:bg-red-50 rounded-xl"><div className="flex gap-3"><div className="bg-red-50 p-2 rounded-lg text-red-600"><LogOut size={18}/></div><span className="text-xs font-semibold text-red-600 pt-1">Keluar</span></div></button>
+                   </div>
+                </div>
+             )}
           </div>
+
+          <div className="absolute bottom-0 w-full flex justify-around px-2 py-2 z-20 pb-safe rounded-t-3xl shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.3)] bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white">
+            <BottomNavItem icon={<Home size={20}/>} label="Beranda" isActive={activeTab==='home'} onClick={()=>setActiveTab('home')} />
+            <BottomNavItem icon={<History size={20}/>} label="Riwayat" isActive={activeTab==='history'} onClick={()=>setActiveTab('history')} />
+            <BottomNavItem icon={<BarChart3 size={20}/>} label="Peringkat" isActive={activeTab==='insight'} onClick={()=>setActiveTab('insight')} />
+            <BottomNavItem icon={<Settings size={20}/>} label="Setting" isActive={activeTab==='settings'} onClick={()=>setActiveTab('settings')} />
+          </div>
+
+          {/* Modal Edit Account Jamaah */}
+          {showEditAcc && (
+            <div className="absolute inset-0 z-50 bg-black/60 flex flex-col justify-end"><div className={`rounded-t-3xl p-6 h-[75%] ${isDarkMode?'bg-slate-900 text-white':'bg-white'}`}><div className="flex justify-between items-center mb-5"><h3 className="font-bold">Edit Akun</h3><button onClick={()=>setShowEditAcc(false)} className="text-xs">Tutup</button></div><form onSubmit={handleSaveAcc} className="space-y-4"><div><label className="text-xs font-bold block mb-1">Username Baru</label><input type="text" className={inputClass} value={edUser} onChange={e=>setEdUser(e.target.value)} required /></div><div><label className="text-xs font-bold block mb-1">Password Baru</label><input type="text" className={inputClass} value={edPass} onChange={e=>setEdPass(e.target.value)} required /></div><button type="submit" className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-2xl text-xs mt-4">Simpan Perubahan</button></form></div></div>
+          )}
         </div>
       );
     }
