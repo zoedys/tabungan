@@ -1,9 +1,9 @@
 {
-  "name": "Sitajam Management",
+  "name": "Sitajam Al-Muttaqin",
   "short_name": "Sitajam",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F4F6F9",
+  "background_color": "#e2e8f0",
   "theme_color": "#00529C",
   "icons": [
     {
