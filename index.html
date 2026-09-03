@@ -31,8 +31,11 @@
     }
     .animate-slide-down { animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   </style>
+  
+  <!-- KODE PWA & LOGO BARU ANDA -->
   <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00529C">
+  <meta name="theme-color" content="#00529C">
+  <link rel="apple-touch-icon" href="./logo-sitajam.png">
 </head>
 <body class="bg-slate-200">
 
@@ -44,17 +47,15 @@
     // ==========================================
     // KONFIGURASI API GITHUB -> GAS
     // ==========================================
-    // MASUKKAN URL WEB APP GAS ANDA DI BAWAH INI
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzB7g57NIvcorjSUpyxwTN_7WMwkjeahK-KSMPHpl91DRFsaV8fVG3nzJwfhVjOvKCloQ/exec";
 
-// Helper untuk kirim data ke GAS (Versi GET - Anti Gagal & Anti Blokir)
+    // Helper untuk kirim data ke GAS
     const sendToGAS = (action, payload) => {
-      // Data dibungkus ke dalam link URL agar tidak hilang saat diredirect Google
       const dataString = encodeURIComponent(JSON.stringify(payload));
       const finalUrl = GAS_URL + "?action=" + action + "&data=" + dataString;
 
       return fetch(finalUrl, {
-        method: "GET" // Menggunakan GET
+        method: "GET" 
       })
       .then(res => res.json())
       .then(res => console.log("Data berhasil disimpan:", res))
@@ -139,7 +140,6 @@
       const [notifications, setNotifications] = useState([]);
 
       useEffect(() => {
-        // MENGGUNAKAN FETCH API UNTUK MENGAMBIL DATA
         fetch(GAS_URL + "?action=getInitialData")
           .then(res => res.json())
           .then(data => {
@@ -219,7 +219,12 @@
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold"><Sparkles size={13} className="animate-spin" style={{ animationDuration: '4s' }} /><span>Tabungan Digital By Zoedys</span></div>
               <button onClick={toggleDarkMode} className="p-2.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition active:scale-95">{isDarkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}</button>
             </div>
-            <div className="flex justify-center mb-5"><div className="relative p-1 rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-emerald-400 shadow-lg"><div className="bg-slate-900 p-4 rounded-[22px]"><Wallet size={36} className="text-emerald-400" /></div></div></div>
+            
+            {/* INI BAGIAN LOGO YANG SUDAH DIGANTI */}
+            <div className="flex justify-center mb-5">
+              <img src="./logo-sitajam.png" alt="Logo Sitajam" className="w-24 h-24 object-contain drop-shadow-xl" />
+            </div>
+
             <div className="text-center mb-6"><h1 className="text-xl font-bold tracking-tight">SITAJAM AL-MUTTAQIN</h1><p className="text-xs text-slate-500 mt-1">Sistem Tabungan Jama'ah Yasinan Al-Muttaqin Pungangan Jurang</p></div>
 
             {error && <div className="mb-4 p-3 rounded-2xl bg-red-500/10 text-red-500 text-xs flex items-center gap-2"><ShieldAlert size={16} /><span>{error}</span></div>}
@@ -280,7 +285,7 @@
         e.preventDefault();
         const updated = { ...currentUser, username: adminUsername, password: adminPassword };
         setUsers(users.map(u => u.id === currentUser.id ? updated : u)); setCurrentUser(updated);
-        sendToGAS('updateUser', updated); // MENGIRIM VIA API
+        sendToGAS('updateUser', updated);
         setAdminSuccess('Akun diperbarui!'); setTimeout(()=>setShowAdminAccountModal(false), 1500);
       };
 
@@ -288,7 +293,7 @@
         e.preventDefault();
         const updated = { ...users.find(u=>u.id===selectedJamaahId), username: newJamaahUser, password: newJamaahPass };
         setUsers(users.map(u => u.id === selectedJamaahId ? updated : u));
-        sendToGAS('updateUser', updated); // MENGIRIM VIA API
+        sendToGAS('updateUser', updated);
         alert('Data Jamaah berhasil di-reset!'); setShowResetJamaahModal(false);
       };
 
@@ -296,7 +301,7 @@
         e.preventDefault();
         const newAnn = { message: editAnnText, active: editAnnActive, date: new Date().toISOString() };
         setAnnouncement(newAnn);
-        sendToGAS('updateAnnouncement', newAnn); // MENGIRIM VIA API
+        sendToGAS('updateAnnouncement', newAnn);
         setShowAnnouncementModal(false);
       };
 
@@ -312,7 +317,7 @@
         const newStudentData = { id: `u${Date.now()}`, username: inputUsername, password: newStudent.password, role: 'student', name: inputName, balance: 0, nis: nextID };
         
         setUsers([newStudentData, ...users]);
-        sendToGAS('addStudent', newStudentData); // MENGIRIM VIA API
+        sendToGAS('addStudent', newStudentData);
         setNewStudent({ name: '', username: '', password: '' });
         setShowAddStudent(false); alert(`Berhasil ditambahkan!`);
       };
@@ -323,7 +328,7 @@
         setUsers(users.map(u => u.id === studentId ? { ...u, balance: type === 'in' ? u.balance + Number(amount) : u.balance - Number(amount) } : u));
         setSelectedStudent(prev => ({ ...prev, balance: type === 'in' ? prev.balance + Number(amount) : prev.balance - Number(amount) }));
         setNotifications(prev => [...prev, { id: `notif-${Date.now()}`, studentId, type, amount: Number(amount), read: false, date: new Date().toISOString() }]);
-        sendToGAS('saveTransaction', newTrx); // MENGIRIM VIA API
+        sendToGAS('saveTransaction', newTrx);
       };
 
       const exportPDF = () => {
@@ -577,7 +582,7 @@
 
         const updated = {...user, username:edUser.trim(), password:edPass};
         setUsers(users.map(u => u.id === user.id ? updated : u)); setCurrentUser(updated);
-        sendToGAS('updateUser', updated); // MENGIRIM VIA API
+        sendToGAS('updateUser', updated);
         alert('Akun diperbarui!'); setShowEditAcc(false);
       };
 
