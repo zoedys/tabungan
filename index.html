@@ -31,6 +31,8 @@
     }
     .animate-slide-down { animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   </style>
+  <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00529C">
 </head>
 <body class="bg-slate-200">
 
@@ -719,5 +721,13 @@
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
+  <script>
+        // Daftarkan PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
 </body>
 </html>
